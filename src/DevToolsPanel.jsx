@@ -8,6 +8,9 @@ const DevToolsPanel = () => {
   const [requests, setRequests] = useState({});
   const [search, setSearch] = useState("");
   const [filteredRequests, setFilteredRequests] = useState([]);
+  const [dbrequests, setDbRequests] = useState([]);
+  const [loadingRequests, setLoadingRequests] = useState([]);
+  const [preAggRequests, setPreAggRequests] = useState([]);
 
   function clearList() {
     setRequests({});
@@ -17,6 +20,26 @@ const DevToolsPanel = () => {
   function onSearchChange(e) {
     setSearch(e.target.value);
   }
+
+  useEffect(() => {
+    const dbReq = Object.values(filteredRequests)
+      .filter((e) => e.status === "success")
+      .filter((e) => e.preagg[0])
+      .filter((e) => Object.keys(e.preagg[0].usedPreAggregations).length === 0);
+
+    const loadingReq = Object.values(filteredRequests).filter(
+      (e) => e.status === "loading or error "
+    );
+
+    const preAggReq = Object.values(filteredRequests)
+      .filter((e) => e.status === "success")
+      .filter((e) => e.preagg[0])
+      .filter((e) => Object.keys(e.preagg[0].usedPreAggregations).length > 0);
+
+    setPreAggRequests(preAggReq);
+    setLoadingRequests(loadingReq);
+    setDbRequests(dbReq);
+  }, [filteredRequests]);
 
   useEffect(() => {
     if (search === "") {
@@ -157,7 +180,6 @@ const DevToolsPanel = () => {
 
   return (
     <div>
-      <div>Total Queries : {Object.keys(requests).length} </div>
       <div>
         <button
           className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-4 rounded"
@@ -174,12 +196,18 @@ const DevToolsPanel = () => {
         />
         <Tabs defaultValue="all" className="w-full">
           <TabsList>
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="loading">Loading</TabsTrigger>
+            <TabsTrigger value="all">
+              All ({Object.keys(requests).length})
+            </TabsTrigger>
+            <TabsTrigger value="loading">
+              Loading ({loadingRequests.length})
+            </TabsTrigger>
             <TabsTrigger value="success">success</TabsTrigger>
             <TabsTrigger value="slow">slow</TabsTrigger>
-            <TabsTrigger value="pre-agg">pre-agg</TabsTrigger>
-            <TabsTrigger value="db">db query</TabsTrigger>
+            <TabsTrigger value="pre-agg">
+              pre-agg ({preAggRequests.length}){" "}
+            </TabsTrigger>
+            <TabsTrigger value="db">db query ({dbrequests.length})</TabsTrigger>
             <TabsTrigger value="raw">raw</TabsTrigger>
           </TabsList>
           <TabsContent value="all">
@@ -191,11 +219,9 @@ const DevToolsPanel = () => {
               ))}
           </TabsContent>
           <TabsContent value="loading">
-            {Object.values(filteredRequests)
-              .filter((e) => e.status === "loading or error ")
-              .map((e, index) => (
-                <QueryRow query={e} key={index} />
-              ))}
+            {loadingRequests.map((e, index) => (
+              <QueryRow query={e} key={index} />
+            ))}
           </TabsContent>
           <TabsContent value="success">
             {Object.values(filteredRequests)
@@ -212,26 +238,14 @@ const DevToolsPanel = () => {
               ))}
           </TabsContent>
           <TabsContent value="pre-agg">
-            {Object.values(filteredRequests)
-              .filter((e) => e.status === "success")
-              .filter((e) => e.preagg[0])
-              .filter(
-                (e) => Object.keys(e.preagg[0].usedPreAggregations).length > 0
-              )
-              .map((e, index) => (
-                <QueryRow query={e} key={index} />
-              ))}
+            {preAggRequests.map((e, index) => (
+              <QueryRow query={e} key={index} />
+            ))}
           </TabsContent>
           <TabsContent value="db">
-            {Object.values(filteredRequests)
-              .filter((e) => e.status === "success")
-              .filter((e) => e.preagg[0])
-              .filter(
-                (e) => Object.keys(e.preagg[0].usedPreAggregations).length === 0
-              )
-              .map((e, index) => (
-                <QueryRow query={e} key={index} />
-              ))}
+            {dbrequests.map((e, index) => (
+              <QueryRow query={e} key={index} />
+            ))}
           </TabsContent>
           <TabsContent value="raw">
             <pre>
