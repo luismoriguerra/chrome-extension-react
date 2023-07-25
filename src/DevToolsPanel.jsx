@@ -87,6 +87,13 @@ const DevToolsPanel = () => {
             cubeResponse.results.map((r) => ({
               usedPreAggregations: r.usedPreAggregations,
             }));
+          prevQueryData.isAdditive =
+            cubeResponse &&
+            cubeResponse.results &&
+            cubeResponse.results.map((r) => ({
+              isAdditive: r.transformedQuery && r.transformedQuery.isAdditive,
+            }));
+          prevQueryData.fullResults = cubeResponse && cubeResponse.results;
         } else {
           prevQueryData = {
             query: JSON.parse(query),
@@ -118,6 +125,19 @@ const DevToolsPanel = () => {
               cubeResponse.results.map((r) => ({
                 usedPreAggregations: r.usedPreAggregations,
               })),
+            isAdditive:
+              cubeResponse &&
+              cubeResponse.results &&
+              cubeResponse.results.map((r) => ({
+                isAdditive: r.transformedQuery && r.transformedQuery.isAdditive,
+              })),
+            isAdditive:
+              cubeResponse &&
+              cubeResponse.results &&
+              cubeResponse.results.map((r) => ({
+                isAdditive: r.transformedQuery && r.transformedQuery.isAdditive,
+              })),
+            fullResults: cubeResponse && cubeResponse.results,
           };
         }
 
@@ -196,7 +216,7 @@ const DevToolsPanel = () => {
               .filter((e) => e.status === "success")
               .filter((e) => e.preagg[0])
               .filter(
-                (e) => typeof e.preagg[0].usedPreAggregations === "object"
+                (e) => Object.keys(e.preagg[0].usedPreAggregations).length > 0
               )
               .map((e, index) => (
                 <QueryRow query={e} key={index} />
@@ -207,7 +227,7 @@ const DevToolsPanel = () => {
               .filter((e) => e.status === "success")
               .filter((e) => e.preagg[0])
               .filter(
-                (e) => typeof e.preagg[0].usedPreAggregations !== "object"
+                (e) => Object.keys(e.preagg[0].usedPreAggregations).length === 0
               )
               .map((e, index) => (
                 <QueryRow query={e} key={index} />

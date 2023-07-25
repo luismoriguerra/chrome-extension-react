@@ -26,6 +26,8 @@ export default function QueryRow({ query }) {
           {query.count} - {query.status} - {query.errors}
         </div>
         {/*  */}
+        <div>isAdditive: {JSON.stringify(query.isAdditive)}</div>
+        {/*  */}
         <details className="border rounded-md m-1 p-1  ">
           <summary>{JSON.stringify(query.query)}</summary>
           <div>
@@ -41,6 +43,17 @@ export default function QueryRow({ query }) {
         </details>
         {/*  */}
         <details className="border rounded-md m-1 p-1  ">
+          <summary>preagg</summary>
+          <div>
+            {query.preagg.map((p, index) => (
+              <div key={index}>
+                <pre>{JSON.stringify(p, null, 2)}</pre>
+              </div>
+            ))}
+          </div>
+        </details>
+        {/*  */}
+        <details className="border rounded-md m-1 p-1  ">
           <summary>Response</summary>
           <div>
             {query.data.map((data, index) => (
@@ -50,6 +63,18 @@ export default function QueryRow({ query }) {
             ))}
           </div>
         </details>
+        {/*  */}
+        <details className="border rounded-md m-1 p-1  ">
+          <summary>full results</summary>
+          <div>
+            {query.fullResults.map((data, index) => (
+              <div key={index}>
+                <pre>{JSON.stringify(data, null, 2)}</pre>
+              </div>
+            ))}
+          </div>
+        </details>
+        {/*  */}
       </div>
       {/*  */}
     </div>
