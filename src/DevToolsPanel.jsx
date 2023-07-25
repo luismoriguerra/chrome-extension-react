@@ -1,8 +1,8 @@
-//@ts-check
 /* eslint-disable no-undef */
 import React, { useState, useEffect } from "react";
 import { tryInPlayground, getPlayQueriesFromRawQuery } from "./utils/utils";
 import QueryRow from "./components/QueryRow";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 
 const DevToolsPanel = () => {
   const [requests, setRequests] = useState({});
@@ -11,6 +11,7 @@ const DevToolsPanel = () => {
 
   function clearList() {
     setRequests({});
+    setSearch("");
   }
 
   function onSearchChange(e) {
@@ -22,9 +23,10 @@ const DevToolsPanel = () => {
       setFilteredRequests(Object.values(requests));
     } else {
       setFilteredRequests(
-        // @ts-ignore
         Object.values(requests).filter((e) =>
-          JSON.stringify(e).toLocaleLowerCase().includes(search)
+          JSON.stringify(e)
+            .toLocaleLowerCase()
+            .includes(search.toLocaleLowerCase())
         )
       );
     }
@@ -150,22 +152,77 @@ const DevToolsPanel = () => {
           value={search}
           onChange={onSearchChange}
         />
-        <div className="table">
-          <div className="grid grid-cols-[100px,1fr]">
-            <div>time</div>
-            <div>Response</div>
-          </div>
-          <div>
-            <div className="">
-              {Object.values(filteredRequests)
-                .sort((a, b) => b.status - a.status)
-                .sort((a, b) => b.created - a.created)
-                .map((e, index) => (
-                  <QueryRow query={e} key={index} />
-                ))}
-            </div>
-          </div>
-        </div>
+        <Tabs defaultValue="all" className="w-full">
+          <TabsList>
+            <TabsTrigger value="all">All</TabsTrigger>
+            <TabsTrigger value="loading">Loading</TabsTrigger>
+            <TabsTrigger value="success">success</TabsTrigger>
+            <TabsTrigger value="slow">slow</TabsTrigger>
+            <TabsTrigger value="pre-agg">pre-agg</TabsTrigger>
+            <TabsTrigger value="db">db query</TabsTrigger>
+            <TabsTrigger value="raw">raw</TabsTrigger>
+          </TabsList>
+          <TabsContent value="all">
+            {Object.values(filteredRequests)
+              .sort((a, b) => b.status - a.status)
+              .sort((a, b) => b.created - a.created)
+              .map((e, index) => (
+                <QueryRow query={e} key={index} />
+              ))}
+          </TabsContent>
+          <TabsContent value="loading">
+            {Object.values(filteredRequests)
+              .filter((e) => e.status === "loading or error ")
+              .map((e, index) => (
+                <QueryRow query={e} key={index} />
+              ))}
+          </TabsContent>
+          <TabsContent value="success">
+            {Object.values(filteredRequests)
+              .filter((e) => e.status === "success")
+              .map((e, index) => (
+                <QueryRow query={e} key={index} />
+              ))}
+          </TabsContent>
+          <TabsContent value="slow">
+            {Object.values(filteredRequests)
+              .filter((e) => e.count > 1)
+              .map((e, index) => (
+                <QueryRow query={e} key={index} />
+              ))}
+          </TabsContent>
+          <TabsContent value="pre-agg">
+            {Object.values(filteredRequests)
+              .filter((e) => e.status === "success")
+              .filter((e) => e.preagg[0])
+              .filter(
+                (e) => typeof e.preagg[0].usedPreAggregations === "object"
+              )
+              .map((e, index) => (
+                <QueryRow query={e} key={index} />
+              ))}
+          </TabsContent>
+          <TabsContent value="db">
+            {Object.values(filteredRequests)
+              .filter((e) => e.status === "success")
+              .filter((e) => e.preagg[0])
+              .filter(
+                (e) => typeof e.preagg[0].usedPreAggregations !== "object"
+              )
+              .map((e, index) => (
+                <QueryRow query={e} key={index} />
+              ))}
+          </TabsContent>
+          <TabsContent value="raw">
+            <pre>
+              {JSON.stringify(
+                Object.values(filteredRequests).map((e) => e.query),
+                null,
+                2
+              )}
+            </pre>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

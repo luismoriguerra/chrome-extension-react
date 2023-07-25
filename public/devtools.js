@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 chrome.devtools.panels.create(
-  "React",
+  "Insights Cube Queries",
   null, // No icon path
   "index.html", // Path to HTML of new panel
   function (panel) {
