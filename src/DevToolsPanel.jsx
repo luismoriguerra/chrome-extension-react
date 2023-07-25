@@ -2,6 +2,7 @@
 /* eslint-disable no-undef */
 import React, { useState, useEffect } from "react";
 import { tryInPlayground, getPlayQueriesFromRawQuery } from "./utils/utils";
+import QueryRow from "./components/QueryRow";
 
 const DevToolsPanel = () => {
   const [requests, setRequests] = useState({});
@@ -59,7 +60,6 @@ const DevToolsPanel = () => {
         if (prevQueryData) {
           prevQueryData.count = prevQueryData.count + 1;
           prevQueryData.time = prevQueryData.time + cubeTime;
-          prevQueryData.created = new Date().getTime();
           prevQueryData.links = tryInPlayground(
             getPlayQueriesFromRawQuery(JSON.parse(query)),
             isLocalhost
@@ -161,62 +161,7 @@ const DevToolsPanel = () => {
                 .sort((a, b) => b.status - a.status)
                 .sort((a, b) => b.created - a.created)
                 .map((e, index) => (
-                  <div
-                    key={index}
-                    className="grid grid-cols-[100px,1fr] border divide-x-2"
-                  >
-                    <div className="overflow-x-scroll whitespace-pre-wrap">
-                      {e.time}
-                    </div>
-                    {/*  */}
-                    <div className="details w-full max-h-[500px] overflow-auto">
-                      {/*  */}
-                      <div>
-                        {e.links.map((link, index) => (
-                          <div key={index}>
-                            <a
-                              className="text-blue-500 hover:text-blue-800"
-                              href={link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              play url
-                            </a>{" "}
-                          </div>
-                        ))}
-                      </div>
-                      {/*  */}
-                      <div>
-                        {e.count} - {e.status} - {e.errors}
-                      </div>
-                      {/*  */}
-                      <details className="border rounded-md m-1 p-1  ">
-                        <summary>{JSON.stringify(e.query)}</summary>
-                        <div>
-                          <pre>{JSON.stringify(e.query, null, 2)}</pre>
-                        </div>
-                      </details>
-                      {/*  */}
-                      <details className="border rounded-md m-1 p-1  ">
-                        <summary>{`filters`}</summary>
-                        <div>
-                          <pre>{JSON.stringify(e.filters[0], null, 2)}</pre>
-                        </div>
-                      </details>
-                      {/*  */}
-                      <details className="border rounded-md m-1 p-1  ">
-                        <summary>Response</summary>
-                        <div>
-                          {e.data.map((data, index) => (
-                            <div key={index}>
-                              <pre>{JSON.stringify(data, null, 2)}</pre>
-                            </div>
-                          ))}
-                        </div>
-                      </details>
-                    </div>
-                    {/*  */}
-                  </div>
+                  <QueryRow query={e} key={index} />
                 ))}
             </div>
           </div>
