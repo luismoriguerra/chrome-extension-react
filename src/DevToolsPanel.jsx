@@ -24,7 +24,7 @@ const DevToolsPanel = () => {
   useEffect(() => {
     const dbReq = Object.values(filteredRequests)
       .filter((e) => e.status === "success")
-      .filter((e) => e.preagg[0] && e.preagg[0].usedPreAggregations)
+      .filter((e) => e.preagg && e.preagg[0] && e.preagg[0].usedPreAggregations)
       .filter((e) => Object.keys(e.preagg[0].usedPreAggregations).length === 0);
 
     const loadingReq = Object.values(filteredRequests).filter(
@@ -33,7 +33,7 @@ const DevToolsPanel = () => {
 
     const preAggReq = Object.values(filteredRequests)
       .filter((e) => e.status === "success")
-      .filter((e) => e.preagg[0] && e.preagg[0].usedPreAggregations)
+      .filter((e) => e.preagg && e.preagg[0] && e.preagg[0].usedPreAggregations)
       .filter((e) => Object.keys(e.preagg[0].usedPreAggregations).length > 0);
 
     setPreAggRequests(preAggReq);

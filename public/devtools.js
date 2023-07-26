@@ -28,7 +28,7 @@ chrome.devtools.panels.create(
           message: {
             cubeRequest: request.request,
             cubeTime: request.time,
-            cubeResponse: JSON.parse(body),
+            cubeResponse: body && JSON.parse(body),
           },
         });
       });
