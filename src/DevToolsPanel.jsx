@@ -11,6 +11,7 @@ const DevToolsPanel = () => {
   const [dbrequests, setDbRequests] = useState([]);
   const [loadingRequests, setLoadingRequests] = useState([]);
   const [preAggRequests, setPreAggRequests] = useState([]);
+  const [slowRequests, setSlowRequests] = useState([]);
 
   function clearList() {
     setRequests({});
@@ -36,6 +37,9 @@ const DevToolsPanel = () => {
       .filter((e) => e.preagg && e.preagg[0] && e.preagg[0].usedPreAggregations)
       .filter((e) => Object.keys(e.preagg[0].usedPreAggregations).length > 0);
 
+    const slowReq = Object.values(filteredRequests).filter((e) => e.count > 1);
+
+    setSlowRequests(slowReq);
     setPreAggRequests(preAggReq);
     setLoadingRequests(loadingReq);
     setDbRequests(dbReq);
@@ -209,11 +213,13 @@ const DevToolsPanel = () => {
             <TabsTrigger value="all">
               All ({Object.keys(requests).length})
             </TabsTrigger>
-            <TabsTrigger value="loading">
+            <TabsTrigger value="loading|error">
               Loading ({loadingRequests.length})
             </TabsTrigger>
             <TabsTrigger value="success">success</TabsTrigger>
-            <TabsTrigger value="slow">slow</TabsTrigger>
+            <TabsTrigger value="slow">
+              slow ({slowRequests.length}){" "}
+            </TabsTrigger>
             <TabsTrigger value="pre-agg">
               pre-agg ({preAggRequests.length}){" "}
             </TabsTrigger>
@@ -241,11 +247,9 @@ const DevToolsPanel = () => {
               ))}
           </TabsContent>
           <TabsContent value="slow">
-            {Object.values(filteredRequests)
-              .filter((e) => e.count > 1)
-              .map((e, index) => (
-                <QueryRow query={e} key={index} />
-              ))}
+            {slowRequests.map((e, index) => (
+              <QueryRow query={e} key={index} />
+            ))}
           </TabsContent>
           <TabsContent value="pre-agg">
             {preAggRequests.map((e, index) => (
