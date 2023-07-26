@@ -24,7 +24,7 @@ const DevToolsPanel = () => {
   useEffect(() => {
     const dbReq = Object.values(filteredRequests)
       .filter((e) => e.status === "success")
-      .filter((e) => e.preagg[0])
+      .filter((e) => e.preagg[0] && e.preagg[0].usedPreAggregations)
       .filter((e) => Object.keys(e.preagg[0].usedPreAggregations).length === 0);
 
     const loadingReq = Object.values(filteredRequests).filter(
@@ -33,7 +33,7 @@ const DevToolsPanel = () => {
 
     const preAggReq = Object.values(filteredRequests)
       .filter((e) => e.status === "success")
-      .filter((e) => e.preagg[0])
+      .filter((e) => e.preagg[0] && e.preagg[0].usedPreAggregations)
       .filter((e) => Object.keys(e.preagg[0].usedPreAggregations).length > 0);
 
     setPreAggRequests(preAggReq);
@@ -104,6 +104,11 @@ const DevToolsPanel = () => {
               cubeResponse.results &&
               cubeResponse.results.map((r) => r.data)) ||
             [];
+          prevQueryData.slowQuery =
+            (cubeResponse &&
+              cubeResponse.results &&
+              cubeResponse.results.map((r) => r.slowQuery)) ||
+            [];
           prevQueryData.preagg =
             cubeResponse &&
             cubeResponse.results &&
@@ -141,6 +146,11 @@ const DevToolsPanel = () => {
               (cubeResponse &&
                 cubeResponse.results &&
                 cubeResponse.results.map((r) => r.data)) ||
+              [],
+            slowQuery:
+              (cubeResponse &&
+                cubeResponse.results &&
+                cubeResponse.results.map((r) => r.slowQuery)) ||
               [],
             preagg:
               cubeResponse &&

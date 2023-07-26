@@ -28,6 +28,8 @@ export default function QueryRow({ query }) {
         {/*  */}
         <div>isAdditive: {JSON.stringify(query.isAdditive)}</div>
         {/*  */}
+        <div>slowQuery: {JSON.stringify(query.slowQuery)}</div>
+        {/*  */}
         <details className="border rounded-md m-1 p-1  ">
           <summary>{JSON.stringify(query.query)}</summary>
           <div>
@@ -45,11 +47,12 @@ export default function QueryRow({ query }) {
         <details className="border rounded-md m-1 p-1  ">
           <summary>preagg</summary>
           <div>
-            {query.preagg.map((p, index) => (
-              <div key={index}>
-                <pre>{JSON.stringify(p, null, 2)}</pre>
-              </div>
-            ))}
+            {query.preagg &&
+              query.preagg.map((p, index) => (
+                <div key={index}>
+                  <pre>{JSON.stringify(p, null, 2)}</pre>
+                </div>
+              ))}
           </div>
         </details>
         {/*  */}
